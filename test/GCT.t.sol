@@ -8,7 +8,7 @@ contract GCTTest is Test {
     GCT private token;
 
     function testOwnerCanMint() public {
-        token = new GCT("Guaranteed Capacity Token", "GCT", address(this), 0);
+        token = _newToken(address(this), 0, 1000 ether);
 
         token.mint(address(0xBEEF), 100 ether);
 
@@ -17,10 +17,27 @@ contract GCTTest is Test {
     }
 
     function testNonOwnerCannotMint() public {
-        token = new GCT("Guaranteed Capacity Token", "GCT", address(this), 0);
+        token = _newToken(address(this), 0, 1000 ether);
 
         vm.prank(address(0xBEEF));
         vm.expectRevert(GCT.NotOwner.selector);
+        token.mint(address(0xBEEF), 1 ether);
+    }
+
+    function testMintCannotExceedMaxSupply() public {
+        token = _newToken(address(this), 90 ether, 100 ether);
+
+        vm.expectRevert(GCT.MaxSupplyExceeded.selector);
+        token.mint(address(0xBEEF), 11 ether);
+    }
+
+    function testOwnerCanFinalizeMinting() public {
+        token = _newToken(address(this), 0, 100 ether);
+
+        token.finalizeMinting();
+
+        assertTrue(token.mintingFinalized());
+        vm.expectRevert(GCT.MintingClosed.selector);
         token.mint(address(0xBEEF), 1 ether);
     }
 
@@ -28,7 +45,7 @@ contract GCTTest is Test {
         uint256 privateKey = 0xA11CE;
         address owner = vm.addr(privateKey);
         address recipient = address(0xBEEF);
-        token = new GCT("Guaranteed Capacity Token", "GCT", owner, 10 ether);
+        token = _newToken(owner, 10 ether, 1000 ether);
 
         bytes32 nonce = keccak256("nonce-1");
         uint256 validAfter = block.timestamp - 1;
@@ -49,7 +66,7 @@ contract GCTTest is Test {
         uint256 privateKey = 0xA11CE;
         address owner = vm.addr(privateKey);
         address recipient = address(0xBEEF);
-        token = new GCT("Guaranteed Capacity Token", "GCT", owner, 10 ether);
+        token = _newToken(owner, 10 ether, 1000 ether);
 
         bytes32 nonce = keccak256("nonce-zero-one-v");
         uint256 validAfter = block.timestamp - 1;
@@ -68,7 +85,7 @@ contract GCTTest is Test {
         uint256 privateKey = 0xA11CE;
         address owner = vm.addr(privateKey);
         address recipient = address(0xBEEF);
-        token = new GCT("Guaranteed Capacity Token", "GCT", owner, 10 ether);
+        token = _newToken(owner, 10 ether, 1000 ether);
 
         bytes32 nonce = keccak256("nonce-1");
         uint256 validAfter = block.timestamp - 1;
@@ -89,7 +106,7 @@ contract GCTTest is Test {
         uint256 privateKey = 0xA11CE;
         address owner = vm.addr(privateKey);
         address recipient = address(0xBEEF);
-        token = new GCT("Guaranteed Capacity Token", "GCT", owner, 10 ether);
+        token = _newToken(owner, 10 ether, 1000 ether);
 
         bytes32 nonce = keccak256("receive-nonce");
         uint256 validAfter = block.timestamp - 1;
@@ -116,7 +133,7 @@ contract GCTTest is Test {
         uint256 privateKey = 0xA11CE;
         address owner = vm.addr(privateKey);
         address recipient = address(0xBEEF);
-        token = new GCT("Guaranteed Capacity Token", "GCT", owner, 10 ether);
+        token = _newToken(owner, 10 ether, 1000 ether);
 
         bytes32 nonce = keccak256("cancel-nonce");
         uint256 validAfter = block.timestamp - 1;
@@ -147,7 +164,7 @@ contract GCTTest is Test {
         uint256 otherPrivateKey = 0xB0B;
         address owner = vm.addr(ownerPrivateKey);
         address recipient = address(0xBEEF);
-        token = new GCT("Guaranteed Capacity Token", "GCT", owner, 10 ether);
+        token = _newToken(owner, 10 ether, 1000 ether);
 
         bytes32 nonce = keccak256("bad-signer");
         uint256 validAfter = block.timestamp - 1;
@@ -180,6 +197,15 @@ contract GCTTest is Test {
             validAfter,
             validBefore,
             nonce
+        );
+    }
+
+    function _newToken(address initialRecipient, uint256 initialSupply, uint256 maxSupply)
+        private
+        returns (GCT)
+    {
+        return new GCT(
+            "Guaranteed Capacity Token", "GCT", initialRecipient, initialSupply, maxSupply
         );
     }
 

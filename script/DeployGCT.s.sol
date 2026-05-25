@@ -10,12 +10,14 @@ contract DeployGCT is Script {
         string memory symbol = vm.envOr("GCT_SYMBOL", string("GCT"));
         address initialRecipient = vm.envOr("GCT_INITIAL_RECIPIENT", msg.sender);
         uint256 initialSupply = vm.envOr("GCT_INITIAL_SUPPLY", uint256(0));
+        uint256 maxSupply = vm.envOr("GCT_MAX_SUPPLY", uint256(1_000_000_000 ether));
 
         vm.startBroadcast();
-        token = new GCT(name, symbol, initialRecipient, initialSupply);
+        token = new GCT(name, symbol, initialRecipient, initialSupply, maxSupply);
         vm.stopBroadcast();
 
         console2.log("GCT token:", address(token));
         console2.log("owner:", token.owner());
+        console2.log("maxSupply:", token.maxSupply());
     }
 }

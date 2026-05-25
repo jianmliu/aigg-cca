@@ -44,6 +44,9 @@ contract DeployGCTCCA is Script {
         );
         token.mint(auction, auctionSupply);
         IDistributionContract(auction).onTokensReceived();
+        if (vm.envOr("GCT_FINALIZE_MINTING", false)) {
+            token.finalizeMinting();
+        }
         vm.stopBroadcast();
 
         console2.log("GCT token:", address(token));

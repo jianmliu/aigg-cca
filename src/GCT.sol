@@ -9,6 +9,8 @@ contract GCT {
     uint8 public constant decimals = 18;
 
     uint256 public totalSupply;
+    uint256 public immutable maxSupply;
+    bool public mintingFinalized;
     address public owner;
 
     mapping(address => uint256) public balanceOf;
@@ -20,9 +22,13 @@ contract GCT {
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
     event AuthorizationUsed(address indexed authorizer, bytes32 indexed nonce);
     event AuthorizationCanceled(address indexed authorizer, bytes32 indexed nonce);
+    event MintingFinalized(address indexed owner);
 
     error NotOwner();
     error ZeroAddress();
+    error InvalidMaxSupply();
+    error MaxSupplyExceeded();
+    error MintingClosed();
     error InsufficientBalance();
     error InsufficientAllowance();
     error AuthorizationAlreadyUsed();
@@ -56,13 +62,18 @@ contract GCT {
         string memory name_,
         string memory symbol_,
         address initialRecipient,
-        uint256 initialSupply
+        uint256 initialSupply,
+        uint256 maxSupply_
     ) {
         if (initialRecipient == address(0) && initialSupply != 0) {
             revert ZeroAddress();
         }
+        if (maxSupply_ == 0 || initialSupply > maxSupply_) {
+            revert InvalidMaxSupply();
+        }
         name = name_;
         symbol = symbol_;
+        maxSupply = maxSupply_;
         owner = msg.sender;
         emit OwnershipTransferred(address(0), msg.sender);
 
@@ -176,7 +187,13 @@ contract GCT {
     }
 
     function mint(address to, uint256 value) external onlyOwner {
+        if (mintingFinalized) revert MintingClosed();
         _mint(to, value);
+    }
+
+    function finalizeMinting() external onlyOwner {
+        mintingFinalized = true;
+        emit MintingFinalized(msg.sender);
     }
 
     function transferOwnership(address newOwner) external onlyOwner {
@@ -250,6 +267,7 @@ contract GCT {
 
     function _mint(address to, uint256 value) internal {
         if (to == address(0)) revert ZeroAddress();
+        if (totalSupply + value > maxSupply) revert MaxSupplyExceeded();
         totalSupply += value;
         balanceOf[to] += value;
         emit Transfer(address(0), to, value);

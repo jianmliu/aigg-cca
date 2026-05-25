@@ -4,6 +4,11 @@ pragma solidity ^0.8.26;
 import { Script, console2 } from "forge-std/Script.sol";
 import { IContinuousClearingAuction } from "../src/interfaces/IContinuousClearingAuction.sol";
 
+interface IERC20 {
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 value) external returns (bool);
+}
+
 contract BidGCTCCA is Script {
     function run() external returns (uint256 bidId) {
         IContinuousClearingAuction auction =
@@ -17,6 +22,12 @@ contract BidGCTCCA is Script {
         if (auction.currency() == address(0)) {
             bidId = auction.submitBid{ value: amount }(maxPrice, amount, owner, hookData);
         } else {
+            IERC20 currency = IERC20(auction.currency());
+            if (currency.allowance(msg.sender, address(auction)) < amount) {
+                if (!currency.approve(address(auction), type(uint256).max)) {
+                    revert("CCA currency approval failed");
+                }
+            }
             bidId = auction.submitBid(maxPrice, amount, owner, hookData);
         }
         vm.stopBroadcast();
