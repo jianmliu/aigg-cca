@@ -88,6 +88,10 @@ Backend:
 - Uniswap CCA factory: `0x0000ccaDF55C911a2FbC0BB9d2942Aa77c6FAa1D`
 - Default raise currency: `address(0)`, meaning Sepolia ETH
 
+## Deployments
+
+See [docs/deployments.md](docs/deployments.md) for deployed GCT addresses and transaction records.
+
 ## Joint E2E
 
 See [docs/e2e-sepolia.md](docs/e2e-sepolia.md) for the end-to-end flow with
