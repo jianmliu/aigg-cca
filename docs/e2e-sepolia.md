@@ -23,7 +23,7 @@ aigg-src/sub2api.pem
 Run this before attempting the live Sepolia e2e:
 
 ```bash
-cd /Volumes/T7-Data/sub2api3/aigg-cca
+cd /Volumes/T7-Data/sub2api3/AIGG/aigg-cca
 scripts/remote-aigg-src-preflight.sh
 ```
 
@@ -37,7 +37,7 @@ top-ups directly. Do not configure `X402_GCT_ASSET` in `aigg-src` until this ste
 emitted `GCT_TOKEN`.
 
 ```bash
-cd /Volumes/T7-Data/sub2api3/aigg-cca
+cd /Volumes/T7-Data/sub2api3/AIGG/aigg-cca
 cp .env.example .env
 $EDITOR .env
 

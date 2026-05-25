@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LISTINGS_DIR="${LISTINGS_DIR:-/Volumes/T7-Data/sub2api3/aigg-src}"
+LISTINGS_DIR="${LISTINGS_DIR:-/Volumes/T7-Data/sub2api3/AIGG/aigg-src}"
 ENV_FILE="${ENV_FILE:-$LISTINGS_DIR/.env.local}"
 SSH_KEY="${SSH_KEY:-$LISTINGS_DIR/sub2api.pem}"
 SSH_USER="${SSH_USER:-ubuntu}"
