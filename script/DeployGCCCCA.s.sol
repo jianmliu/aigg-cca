@@ -43,7 +43,9 @@ contract DeployGCCCCA is Script {
         console2.log("CCA auction:", auction);
         console2.log("auction supply:", auctionSupply);
         if (rec.seederEnabled) {
+            address reuse = vm.envOr("CCA_V4_REUSE_SEEDER", address(0));
             console2.log("V4 seeder:", rec.seederAddr);
+            console2.log(reuse == address(0) ? "  (newly deployed)" : "  (reused existing)");
             console2.log("LP reserve:", lpReserve);
         }
         console2.log("startBlock:", parameters.startBlock);
@@ -54,7 +56,13 @@ contract DeployGCCCCA is Script {
     function _resolveRecipients(address gccToken) internal returns (Recipients memory rec) {
         rec.seederEnabled = vm.envOr("CCA_V4_SEEDER_ENABLED", false);
         if (rec.seederEnabled) {
-            rec.seederAddr = _deploySeeder(gccToken);
+            // Subsequent CCA rounds reuse the seeder that bootstrapped the V4
+            // pool — same address tracks all liquidity over time, treasury
+            // only manages one LP NFT collection. The first round deploys
+            // a fresh seeder; later rounds set CCA_V4_REUSE_SEEDER to its
+            // address and skip the deploy step entirely.
+            address reuse = vm.envOr("CCA_V4_REUSE_SEEDER", address(0));
+            rec.seederAddr = reuse == address(0) ? _deploySeeder(gccToken) : reuse;
             rec.tokensRecipient = rec.seederAddr;
             rec.fundsRecipient = rec.seederAddr;
         } else {
