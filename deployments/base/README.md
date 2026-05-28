@@ -5,6 +5,42 @@ Canonical Base contracts:
 - ToolRegistry: `0x265BB2DBFC0A8165C9A1941Eb1372F349baD2cf1`
 - SubscriptionPredicate: `0xCBe0cd9B1d99d95Baa9c58f2767246C52e461f25`
 
+## GCC Deployment (Active)
+
+GCC (Guaranteed Capacity Credit) is the platform capacity token that
+replaces the deprecated GCT. ERC-20 + ERC-2612 (Permit) + EIP-3009 surface
+used by the AI.GG x402 facilitator.
+
+- Chain: Base mainnet (8453)
+- GCC ERC-20: `0x135fc92fbd260931bee1c412e87170fad30d7779`
+- Owner: `0x30B10c22F2b136b3dCcFe8d5904A85FE45426b26`
+- name: `Guaranteed Capacity Credit`
+- symbol: `GCC`
+- decimals: `18`
+- maxSupply: `1_000_000_000` GCC (1e27 atoms)
+- mintingFinalized: `false` (operator can still mint up to maxSupply)
+- Deploy tx: `0xf8b5c3d8d78054796d2dcf1ad174d85e55422525e02d741f6d76349048e0ba1d`
+- Deployed: 2026-05-28
+
+basescan:
+- Contract — https://basescan.org/address/0x135fc92fbd260931bee1c412e87170fad30d7779
+- Deploy tx — https://basescan.org/tx/0xf8b5c3d8d78054796d2dcf1ad174d85e55422525e02d741f6d76349048e0ba1d
+
+The CCA auction for GCC is intentionally not yet deployed. Open a separate
+`DeployGCCCCA.s.sol --broadcast` job once the auction duration / floor
+price are decided.
+
+## GCT Deployment (Deprecated)
+
+- GCT ERC-20: `0x7CCb0D3F16C9Ea94a189E14C1d92f6561D707fa4`
+- GCT CCA auction: `0x5107cc753cc9d246de31ec999d549257cde3ae6d`
+
+These contracts predate the 2026-05-28 GCC rebrand and remain on-chain only
+for historical reference. They hold an immaterial residual balance and the
+platform no longer interacts with either.
+
+---
+
 Deploy AI.GG SubscriptionPass:
 
 ```bash
